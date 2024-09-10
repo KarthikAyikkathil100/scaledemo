@@ -1,0 +1,27 @@
+name: Deployment Workflow
+
+on:
+  push:
+    branches:
+      - dev
+
+
+jobs:
+  deploy_development:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    timeout-minutes: 7
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: AWS setup
+        uses: aws/aws-cli
+
+      - name: Updload to S3
+        run: |
+          aws s3 sync . arn:aws:s3:::deployment-pipe
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
+          AWS_DEFAULT_REGION: 'us-east-1'
